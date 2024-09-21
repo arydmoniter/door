@@ -79,13 +79,6 @@ void translateIR() {          // takes action based on IR code received
   }// End Case
 } //END translateIR
 
-void addToCombination(char num) {
-  static int index = 0;
-  if (index < COMBINATION_LENGTH) {
-    irCodeCombination[index++] = num;
-    irCodeCombination[index] = '\0'; // Null-terminate the string
-  }
-}
 
 void setup(){   /*----( SETUP: RUNS ONCE )----*/
   Serial.begin(9600);
