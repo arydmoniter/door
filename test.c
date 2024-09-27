@@ -1,6 +1,12 @@
 #include <IRremote.h>
 
 /*-----( Global Constants )-----*/
+
+bool canOpenDoor = false;
+bool isDoorOpen = false;
+
+const int doorPin = 10;
+const int buzerPin = 9;
 const int receiver = 11;      // Signal Pin of IR receiver to Arduino Digital Pin 11
 const int COMBINATION_LENGTH = 4;
 const char GOOD_LOCK[] = "0920";
@@ -32,6 +38,7 @@ void addAndCheckCombination(char num) {
     addToCombination(num);
     if (checkCombination()) {
       Serial.println("Combination correct!");
+      canOpenDoor = true;
     }
   }
 }
@@ -84,6 +91,10 @@ void setup(){   /*----( SETUP: RUNS ONCE )----*/
   Serial.begin(9600);
   Serial.println("IR Receiver Button Decode");
   irrecv.enableIRIn();           // Start the receiver
+  pinMode(buzerPin, OUTPUT);
+  digitalWrite(buzerPin, LOW);
+  pinMode(doorPin, OUTPUT);
+  digitalWrite(doorPin, LOW);
 }/*--(end setup )---*/
 
 void loop(){   /*----( LOOP: RUNS CONSTANTLY )----*/
@@ -93,4 +104,18 @@ void loop(){   /*----( LOOP: RUNS CONSTANTLY )----*/
     delay(500);                 // Do not get immediate repeat
     irrecv.resume();            // receive the next value
   }
+  if (canOpenDoor) {
+    Serial.println("door can be opened now");
+    delay(10000);
+    canOpenDoor = false;
+  } else {
+    if (isDoorOpen){
+      Serial.println("alarm");
+      digitalWrite(buzerPin, HIGH);
+      delay(500);
+    } else {
+      digitalWrite(buzerPin, LOW);
+    }
+  }
+  isDoorOpen = !digitalRead(10);
 }/* --(end main loop )-- */
