@@ -51,8 +51,10 @@ void translateIR() {          // takes action based on IR code received
   switch(results.value){
     case 0xFFA25D: Serial.println("POWER");
       if (isPowerOn) {
-        Serial.println("Turning off");
-        isPowerOn = false;
+        if (checkCombination()) {
+          Serial.println("Turning off");
+          isPowerOn = false;
+        }
       } else {
         Serial.println("Turning on");
         isPowerOn = true;
