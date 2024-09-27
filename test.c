@@ -4,6 +4,7 @@
 
 bool canOpenDoor = false;
 bool isDoorOpen = false;
+bool isPowerOn = true;
 
 const int doorPin = 10;
 const int buzerPin = 9;
@@ -48,7 +49,15 @@ void translateIR() {          // takes action based on IR code received
   static int index = 0;
 
   switch(results.value){
-    case 0xFFA25D: Serial.println("POWER"); break;
+    case 0xFFA25D: Serial.println("POWER");
+      if (isPowerOn) {
+        Serial.println("Turning off");
+        isPowerOn = false;
+      } else {
+        Serial.println("Turning on");
+        isPowerOn = true;
+      }
+      break;
     case 0xFFE21D: Serial.println("FUNC/STOP"); break;
     case 0xFF629D: Serial.println("VOL+"); break;
     case 0xFF22DD: Serial.println("FAST BACK"); break;
@@ -104,18 +113,21 @@ void loop(){   /*----( LOOP: RUNS CONSTANTLY )----*/
     delay(500);                 // Do not get immediate repeat
     irrecv.resume();            // receive the next value
   }
-  if (canOpenDoor) {
-    Serial.println("door can be opened now");
-    delay(10000);
-    canOpenDoor = false;
-  } else {
-    if (isDoorOpen){
-      Serial.println("alarm");
-      digitalWrite(buzerPin, HIGH);
-      delay(500);
-    } else {
-      digitalWrite(buzerPin, LOW);
-    }
+  if (isPowerOn) {
+      Serial.println("power is on, checking door");
+      if (canOpenDoor) {
+        Serial.println("door can be opened now");
+        delay(10000);
+        canOpenDoor = false;
+      } else {
+        if (isDoorOpen){
+          Serial.println("alarm");
+          digitalWrite(buzerPin, HIGH);
+          delay(500);
+        } else {
+          digitalWrite(buzerPin, LOW);
+        }
+      }
+      isDoorOpen = !digitalRead(10);
   }
-  isDoorOpen = !digitalRead(10);
 }/* --(end main loop )-- */
